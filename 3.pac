@@ -1,12 +1,13 @@
 // =====================================================
 //  JO_PUBG_JO_LOCK.pac
-//  - هدفه: حصر PUBG قدر الإمكان داخل النطاقات المعرّفة
-//  - كل IPv6 literal خارجها يتم منعه
-//  - كل PUBG يمر عبر بروكسي 212.35.66.45
+//  - حصر PUBG قدر الإمكان داخل النطاقات المعرّفة
+//  - منع أي IPv6 literal خارجها
+//  - استثناء كل raw.githubusercontent.com → DIRECT
+//  Proxy: 212.35.66.45
 // =====================================================
 
 var PROXY_IP      = "212.35.66.45";
-var FORBID_NON_JO = true;           // يمنع أي IPv6 literal خارج النطاقات
+var FORBID_NON_JO = true;
 var BLOCK_REPLY   = "PROXY 0.0.0.0:0";
 
 // =====================================================
@@ -28,7 +29,7 @@ function isPrivateOrLocal(host) {
 }
 
 // =====================================================
-// 2) JO_V6_INTERVALS — النطاقات التي تعتبر "مسموح / أردنية قوية"
+// 2) JO_V6_INTERVALS — النطاقات المسموحة / "الأردنية القوية"
 // =====================================================
 
 var JO_V6_INTERVALS = [
@@ -88,7 +89,6 @@ var JO_V6_INTERVALS = [
   { prefix: "2a02:901::/32",       start: "2a02:901::",        end: "2a02:901:ffff:ffff:ffff:ffff:ffff:ffff" }
 ];
 
-// الكل STRONG
 var STRONG_JO_V6_INTERVALS = JO_V6_INTERVALS.slice();
 
 // =====================================================
@@ -251,7 +251,12 @@ function buildProxy(mode){
 
 function FindProxyForURL(url,host){
 
-    // 1) Local / Private → نمرره عبر البروكسي (ما في DIRECT)
+    // 0) استثناء كل raw.githubusercontent.com → DIRECT
+    if (dnsDomainIs(host, "raw.githubusercontent.com")) {
+        return "DIRECT";
+    }
+
+    // 1) Local / Private → عبر البروكسي (ما في DIRECT)
     if (isPrivateOrLocal(host))
         return buildProxy("LOBBY");
 
@@ -260,17 +265,17 @@ function FindProxyForURL(url,host){
     var jo     = ipv6 ? isJOIPv6(ipv6)       : false;
     var strong = ipv6 ? isStrongJOIPv6(ipv6) : false;
 
-    // 2) منع أي IPv6 literal برا النطاقات (مش بس PUBG)
+    // 2) منع أي IPv6 literal برا النطاقات
     if (ipv6 && !jo && FORBID_NON_JO)
         return BLOCK_REPLY;
 
-    // 3) PUBG TRAFFIC → دايمًا بروكسي + أولويّة للنطاقات
+    // 3) PUBG TRAFFIC
     if (isGame){
         var mode = detectMode(url);
 
-        if (strong) return buildProxy(mode);   // أردني قوي
-        if (jo)     return buildProxy("LOBBY"); // أردني عادي
-        return buildProxy(mode);               // لو host بدون literal IPv6
+        if (strong) return buildProxy(mode);
+        if (jo)     return buildProxy("LOBBY");
+        return buildProxy(mode);
     }
 
     // 4) أي شيء غير PUBG → بروكسي لابي
