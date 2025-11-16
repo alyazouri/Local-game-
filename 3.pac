@@ -33,60 +33,162 @@ function isPrivateOrLocal(host) {
 // =====================================================
 
 var JO_V6_INTERVALS = [
-  { prefix: "2a00:18d8:2000::/32", start: "2a00:18d8::",       end: "2a00:18d8:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a00:18d9::/32",      start: "2a00:18d9::",       end: "2a00:18d9:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a00:18da::/32",      start: "2a00:18da::",       end: "2a00:18da:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a01:9700::/32",      start: "2a01:9700::",       end: "2a01:9700:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a01:9701::/32",      start: "2a01:9701::",       end: "2a01:9701:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:1800::/29",      start: "2a02:1800::",       end: "2a02:1807:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:2f00::/29",      start: "2a02:2f00::",       end: "2a02:2f07:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:800::/29",       start: "2a02:800::",        end: "2a02:807:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:8000::/29",      start: "2a02:8000::",       end: "2a02:8007:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:840::/29",       start: "2a02:840::",        end: "2a02:847:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:880::/29",       start: "2a02:880::",        end: "2a02:887:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:8c0::/29",       start: "2a02:8c0::",        end: "2a02:8c7:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:900::/29",       start: "2a02:900::",        end: "2a02:907:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:9c0::/32",       start: "2a02:9c0::",        end: "2a02:9c0:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:a00::/29",       start: "2a02:a00::",        end: "2a02:a07:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:be0::/29",       start: "2a02:be0::",        end: "2a02:be7:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:bf0::/29",       start: "2a02:bf0::",        end: "2a02:bf7:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a03:b640::/29",      start: "2a03:b640::",       end: "2a03:b647:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a03:b640:1000::/40", start: "2a03:b640:1000::",  end: "2a03:b640:10ff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a03:b641::/32",      start: "2a03:b641::",       end: "2a03:b641:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a03:b642::/32",      start: "2a03:b642::",       end: "2a03:b642:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a0d:1000::/32",      start: "2a0d:1000::",       end: "2a0d:1000:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a0d:1001::/32",      start: "2a0d:1001::",       end: "2a0d:1001:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a0d:3a00::/32",      start: "2a0d:3a00::",       end: "2a0d:3a00:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a0d:3a01::/32",      start: "2a0d:3a01::",       end: "2a0d:3a01:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a0d:8d80::/32",      start: "2a0d:8d80::",       end: "2a0d:8d80:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a0d:8d81::/32",      start: "2a0d:8d81::",       end: "2a0d:8d81:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a0d:8d82::/32",      start: "2a0d:8d82::",       end: "2a0d:8d82:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a0e:1c00::/32",      start: "2a0e:1c00::",       end: "2a0e:1c00:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a0e:1c01::/32",      start: "2a0e:1c01::",       end: "2a0e:1c01:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a0e:97c0::/32",      start: "2a0e:97c0::",       end: "2a0e:97c0:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a0e:97c1::/32",      start: "2a0e:97c1::",       end: "2a0e:97c1:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a0e:fc00::/29",      start: "2a0e:fc00::",       end: "2a0e:fc07:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a0e:fc01::/32",      start: "2a0e:fc01::",       end: "2a0e:fc01:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a10:b9c0::/29",      start: "2a10:b9c0::",       end: "2a10:b9c7:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a10:b9c1::/32",      start: "2a10:b9c1::",       end: "2a10:b9c1:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a14:c4c0::/29",      start: "2a14:c4c0::",       end: "2a14:c4c7:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a14:c4c1::/32",      start: "2a14:c4c1::",       end: "2a14:c4c1:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a14:c4c2::/32",      start: "2a14:c4c2::",       end: "2a14:c4c2:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2001:67c:27c0::/48",  start: "2001:67c:27c0::",   end: "2001:67c:27c0:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2001:67c:27c1::/48",  start: "2001:67c:27c1::",   end: "2001:67c:27c1:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2001:67c:27c4::/48",  start: "2001:67c:27c4::",   end: "2001:67c:27c4:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:1801::/32",      start: "2a02:1801::",       end: "2a02:1801:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:1802::/32",      start: "2a02:1802::",       end: "2a02:1802:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:1803::/32",      start: "2a02:1803::",       end: "2a02:1803:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:1804::/32",      start: "2a02:1804::",       end: "2a02:1804:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:2f01::/32",      start: "2a02:2f01::",       end: "2a02:2f01:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:2f02::/32",      start: "2a02:2f02::",       end: "2a02:2f02:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:2f03::/32",      start: "2a02:2f03::",       end: "2a02:2f03:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:2f04::/32",      start: "2a02:2f04::",       end: "2a02:2f04:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:801::/32",       start: "2a02:801::",        end: "2a02:801:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:841::/32",       start: "2a02:841::",        end: "2a02:841:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:881::/32",       start: "2a02:881::",        end: "2a02:881:ffff:ffff:ffff:ffff:ffff:ffff" },
-  { prefix: "2a02:901::/32",       start: "2a02:901::",        end: "2a02:901:ffff:ffff:ffff:ffff:ffff:ffff" }
+    {
+        "prefix": "2a02:1828:ff60::/44",
+        "start":  "2a02:1828:ff60::",
+        "end":    "2a02:1828:ff6f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a02:1828:ff70::/44",
+        "start":  "2a02:1828:ff70::",
+        "end":    "2a02:1828:ff7f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a02:1828:ff80::/44",
+        "start":  "2a02:1828:ff80::",
+        "end":    "2a02:1828:ff8f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a02:1828:ff90::/44",
+        "start":  "2a02:1828:ff90::",
+        "end":    "2a02:1828:ff9f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a02:1828:ffa0::/44",
+        "start":  "2a02:1828:ffa0::",
+        "end":    "2a02:1828:ffaf:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a02:1828:ffb0::/44",
+        "start":  "2a02:1828:ffb0::",
+        "end":    "2a02:1828:ffbf:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a02:1828:ffc0::/44",
+        "start":  "2a02:1828:ffc0::",
+        "end":    "2a02:1828:ffcf:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a02:1828:ffd0::/44",
+        "start":  "2a02:1828:ffd0::",
+        "end":    "2a02:1828:ffdf:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a02:1828:ffe0::/44",
+        "start":  "2a02:1828:ffe0::",
+        "end":    "2a02:1828:ffef:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a02:1828:fff0::/44",
+        "start":  "2a02:1828:fff0::",
+        "end":    "2a02:1828:ffff:ffff:ffff:ffff:ffff:ffff"
+    },
+
+    {
+        "prefix": "2a03:6b00:1000::/44",
+        "start":  "2a03:6b00:1000::",
+        "end":    "2a03:6b00:100f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:100::/44",
+        "start":  "2a03:6b00:100::",
+        "end":    "2a03:6b00:10f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:1010::/44",
+        "start":  "2a03:6b00:1010::",
+        "end":    "2a03:6b00:101f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:1020::/44",
+        "start":  "2a03:6b00:1020::",
+        "end":    "2a03:6b00:102f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:1030::/44",
+        "start":  "2a03:6b00:1030::",
+        "end":    "2a03:6b00:103f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:1040::/44",
+        "start":  "2a03:6b00:1040::",
+        "end":    "2a03:6b00:104f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:1050::/44",
+        "start":  "2a03:6b00:1050::",
+        "end":    "2a03:6b00:105f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:1060::/44",
+        "start":  "2a03:6b00:1060::",
+        "end":    "2a03:6b00:106f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:1070::/44",
+        "start":  "2a03:6b00:1070::",
+        "end":    "2a03:6b00:107f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:1080::/44",
+        "start":  "2a03:6b00:1080::",
+        "end":    "2a03:6b00:108f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:1090::/44",
+        "start":  "2a03:6b00:1090::",
+        "end":    "2a03:6b00:109f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:10::/44",
+        "start":  "2a03:6b00:10::",
+        "end":    "2a03:6b00:1f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:10a0::/44",
+        "start":  "2a03:6b00:10a0::",
+        "end":    "2a03:6b00:10af:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:10b0::/44",
+        "start":  "2a03:6b00:10b0::",
+        "end":    "2a03:6b00:10bf:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:10c0::/44",
+        "start":  "2a03:6b00:10c0::",
+        "end":    "2a03:6b00:10cf:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:10d0::/44",
+        "start":  "2a03:6b00:10d0::",
+        "end":    "2a03:6b00:10df:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:10e0::/44",
+        "start":  "2a03:6b00:10e0::",
+        "end":    "2a03:6b00:10ef:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:10f0::/44",
+        "start":  "2a03:6b00:10f0::",
+        "end":    "2a03:6b00:10ff:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:1100::/44",
+        "start":  "2a03:6b00:1100::",
+        "end":    "2a03:6b00:110f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:110::/44",
+        "start":  "2a03:6b00:110::",
+        "end":    "2a03:6b00:11f:ffff:ffff:ffff:ffff:ffff"
+    },
+    {
+        "prefix": "2a03:6b00:1110::/44",
+        "start":  "2a03:6b00:1110::",
+        "end":    "2a03:6b00:111f:ffff:ffff:ffff:ffff:ffff"
+    }
 ];
 
 var STRONG_JO_V6_INTERVALS = JO_V6_INTERVALS.slice();
