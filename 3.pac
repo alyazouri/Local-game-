@@ -3,10 +3,10 @@
 //  - حصر PUBG قدر الإمكان داخل النطاقات المعرّفة
 //  - منع أي IPv6 literal خارجها
 //  - استثناء كل raw.githubusercontent.com → DIRECT
-//  Proxy: 212.35.66.45
+//  Proxy: 37.220.120.16
 // =====================================================
 
-var PROXY_IP      = "212.35.66.45";
+var PROXY_IP      = "37.220.120.16";
 var FORBID_NON_JO = true;
 var BLOCK_REPLY   = "PROXY 0.0.0.0:0";
 
@@ -335,11 +335,11 @@ function detectMode(url){
 }
 
 var PORTS = {
-    LOBBY:          8443,
+    LOBBY:          443,
     MATCH:          20001,
     RECRUIT_SEARCH: 10012,
-    UPDATES:        8080,
-    CDNS:           28080
+    UPDATES:        80,
+    CDNS:           80
 };
 
 function buildProxy(mode){
