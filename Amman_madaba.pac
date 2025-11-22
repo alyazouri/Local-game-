@@ -16,8 +16,8 @@ var FIXED_PORT = {
   LOBBY:            443,
   MATCH:            20001,
   RECRUIT_SEARCH:   443,
-  UPDATES:          80,
-  CDN:              80
+  UPDATES:          8080,
+  CDN:              8080
 };
 
 // تبديل سريع بين الحظر الصارم وتمرير غير الأردني عبر البروكسي الأردني
