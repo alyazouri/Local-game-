@@ -1,3 +1,8 @@
+// JO-HARD-JORDAN-IPv6 — PUBG Jordan Focus
+// هدف: رفع نسبة اللاعبين الأردنيين لأقصى درجة ممكنة عن طريق إجبار PUBG
+// إنها تستخدم مسارات IPv6 أردنية فقط للماتش / اللوبي / الريكروت / التحديثات.
+
+// ================== إعدادات البروكسي ================== //
 var PROXY_CANDIDATES = [
   "212.35.66.45"
 ];
@@ -14,45 +19,40 @@ var FIXED_PORT = {
   CDN:              80
 };
 
-var STRICT_BLOCK = false;
+// مود هارد أردن: أي مسار مش أردني → نحظره
+var STRICT_BLOCK = true;
 
-// =================== النطاقات الجديدة =================== //
+// ============ نطاقات IPv6 الأردنية الحقيقية فقط ============ //
+var JO_JORDAN_V6 = [
+  // Zain Jordan
+  "2a03:b640::/32",
+
+  // Umniah
+  "2a03:6b00::/29",
+
+  // Orange Jordan
+  "2a00:18d8::/29",
+
+  // GO / Batelco Jordan
+  "2a00:18d0::/29",
+
+  // Mada / JDC
+  "2a00:caa0::/32",
+
+  // National JO allocation + allocations إضافية
+  "2001:32c0::/29",
+  "2a00:4620::/32",
+  "2a00:76e0::/32",
+  "2a00:b860::/32"
+];
+
+// نفس النطاقات لكل كاتيجوري عشان كل شغل PUBG يضل جوّا الأردن
 var JO_V6_PREFIX = {
-  LOBBY: [
-    "2a02:c00::/29",
-    "2a02:1a00::/29",
-    "2a02:4e0::/29",
-    "2a02:aa8::/32",
-    "2a02:aa0::/32"
-  ],
-  MATCH: [
-    "2a02:c00::/29",
-    "2a02:1a00::/29",
-    "2a02:4e0::/29",
-    "2a02:aa8::/32",
-    "2a02:aa0::/32"
-  ],
-  RECRUIT_SEARCH: [
-    "2a02:c00::/29",
-    "2a02:1a00::/29",
-    "2a02:4e0::/29",
-    "2a02:aa8::/32",
-    "2a02:aa0::/32"
-  ],
-  UPDATES: [
-    "2a02:c00::/29",
-    "2a02:1a00::/29",
-    "2a02:4e0::/29",
-    "2a02:aa8::/32",
-    "2a02:aa0::/32"
-  ],
-  CDN: [
-    "2a02:c00::/29",
-    "2a02:1a00::/29",
-    "2a02:4e0::/29",
-    "2a02:aa8::/32",
-    "2a02:aa0::/32"
-  ]
+  LOBBY:          JO_JORDAN_V6,
+  MATCH:          JO_JORDAN_V6,
+  RECRUIT_SEARCH: JO_JORDAN_V6,
+  UPDATES:        JO_JORDAN_V6,
+  CDN:            JO_JORDAN_V6
 };
 
 var DNS_TTL_MS = 15000;
@@ -86,8 +86,26 @@ var URL_PATTERNS = {
 function lc(s){return s&&s.toLowerCase?s.toLowerCase():s;}
 function isIp6Literal(s){return s&&s.indexOf(":")!==-1;}
 
-function hostMatch(h,arr){h=lc(h||"");if(!h)return false;for(var i=0;i<arr.length;i++){var pat=arr[i];if(shExpMatch(h,pat))return true;if(pat.indexOf("*.")==0){var suf=pat.substring(1);if(h.length>=suf.length&&h.substring(h.length-suf.length)===suf)return true;}}return false;}
-function urlMatch(u,arr){if(!u)return false;for(var i=0;i<arr.length;i++){if(shExpMatch(u,arr[i]))return true;}return false;}
+function hostMatch(h,arr){
+  h=lc(h||"");
+  if(!h)return false;
+  for(var i=0;i<arr.length;i++){
+    var pat=arr[i];
+    if(shExpMatch(h,pat))return true;
+    if(pat.indexOf("*.")==0){
+      var suf=pat.substring(1);
+      if(h.length>=suf.length&&h.substring(h.length-suf.length)===suf)return true;
+    }
+  }
+  return false;
+}
+function urlMatch(u,arr){
+  if(!u)return false;
+  for(var i=0;i<arr.length;i++){
+    if(shExpMatch(u,arr[i]))return true;
+  }
+  return false;
+}
 
 function dnsCached(h){
   if(!h)return"";
@@ -229,15 +247,46 @@ function enforceCat(cat, host){
     if(isUnsafeHost(host)) return (STRICT_BLOCK ? "PROXY 0.0.0.0:0" : proxyFor(cat));
     ip = dnsCached(host);
   }
+  // لو الوجهة IPv6 أردنية بنسمح لها عبر البروكسي الأردني
   if(isIp6Literal(ip) && isJOv6ForCat(ip,cat)) return proxyFor(cat);
+  // غير هيك → حظر في مود هارد
   return (STRICT_BLOCK ? "PROXY 0.0.0.0:0" : proxyFor(cat));
 }
 
 function FindProxyForURL(url, host){
   host = lc(host);
 
+  // ✅ استثناء GitHub raw (ملفات PAC)
+  if (hostMatch(host, ["raw.githubusercontent.com"])) {
+    return "DIRECT";
+  }
+
+  // ✅ استثناء YouTube بالكامل
+  if ( hostMatch(host, [
+        "youtube.com",
+        "*.youtube.com",
+        "*.googlevideo.com",
+        "*.ytimg.com"
+      ])
+  ){
+    return "DIRECT";
+  }
+
+  // ✅ استثناء تطبيق/موقع شاهد
+  if ( hostMatch(host, [
+        "shahid.mbc.net",
+        "*.shahid.mbc.net",
+        "shahid.net",
+        "*.shahid.net"
+      ])
+  ){
+    return "DIRECT";
+  }
+
+  // ❗ لازم جهازك + البروكسي يكونوا أردنيين (IPv6 JO)
   if(!clientIsJO() || !proxyIsJO()) return "PROXY 0.0.0.0:0";
 
+  // ========= MATCH / GAME ========= //
   if( urlMatch(url,URL_PATTERNS.MATCH)    ||
       hostMatch(host,PUBG_DOMAINS.MATCH)  ||
       shExpMatch(url,"*/game/join*")      ||
@@ -248,6 +297,7 @@ function FindProxyForURL(url, host){
     return enforceCat("MATCH", host);
   }
 
+  // ========= LOBBY / SOCIAL / RECRUIT ========= //
   if( urlMatch(url,URL_PATTERNS.LOBBY)            ||
       hostMatch(host,PUBG_DOMAINS.LOBBY)          ||
       urlMatch(url,URL_PATTERNS.RECRUIT_SEARCH)   ||
@@ -260,6 +310,7 @@ function FindProxyForURL(url, host){
     return enforceCat("LOBBY", host);
   }
 
+  // ========= UPDATES / CDN ========= //
   if( urlMatch(url,URL_PATTERNS.UPDATES) ||
       urlMatch(url,URL_PATTERNS.CDN)     ||
       hostMatch(host,PUBG_DOMAINS.UPDATES) ||
@@ -268,5 +319,6 @@ function FindProxyForURL(url, host){
     return enforceCat("LOBBY", host);
   }
 
-  return (STRICT_BLOCK ? "PROXY 0.0.0.0:0" : proxyFor("LOBBY"));
+  // أي إشي ثاني في مود هارد → حظر
+  return "PROXY 0.0.0.0:0";
 }
