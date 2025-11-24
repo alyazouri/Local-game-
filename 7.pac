@@ -6,11 +6,11 @@ var PROXY_WHITELIST = [
   "212.35.66.45"
 ];
 var FIXED_PORT = {
-  LOBBY:            443,
+  LOBBY:            8443,
   MATCH:            20001,
-  RECRUIT_SEARCH:   443,
-  UPDATES:          80,
-  CDN:              80
+  RECRUIT_SEARCH:   8443,
+  UPDATES:          8080,
+  CDN:              8080
 };
 
 // **الوضع الصارم** - حظر كل الوجهات غير الأردنية 
