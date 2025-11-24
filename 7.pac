@@ -1,8 +1,10 @@
 
-var PROXY_CANDIDATES = "212.35.66.45";
-
-var PROXY_WHITELIST = "212.35.66.45";
-
+var PROXY_CANDIDATES = [
+  "212.35.66.45"
+];
+var PROXY_WHITELIST = [
+  "212.35.66.45"
+];
 var FIXED_PORT = {
   LOBBY:            443,
   MATCH:            20001,
