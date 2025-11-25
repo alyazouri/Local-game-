@@ -1,6 +1,6 @@
 function FindProxyForURL(url, host) {
   // STRICT_JO_ROUTERS (Catch) — live-built (الآن اسرائيلي)
-  var JO_PROXY_HOST = "77.124.15.36";
+  var JO_PROXY_HOST = "2.54.232.40";
   var PORT_LOBBY = 10010;
   var PORT_MATCH = 20001;
   var PORT_RECRUIT_SEARCH = 12000;
