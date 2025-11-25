@@ -13,9 +13,9 @@ var PROXY_WHITELIST = [
 ];
 
 var FIXED_PORT = {
-  LOBBY:            20001,
+  LOBBY:            80,
   MATCH:            20001,
-  RECRUIT_SEARCH:   20001,
+  RECRUIT_SEARCH:   80,
   UPDATES:          80,
   CDN:              80
 };
