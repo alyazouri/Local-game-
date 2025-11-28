@@ -22,7 +22,7 @@ var FIXED_PORT = {
 
 // تبديل سريع بين الحظر الصارم وتمرير غير الأردني عبر البروكسي الأردني
 // true = حظر الوجهات غير الأردنية، false = تمريرها عبر البروكسي الأردني (بدون DIRECT)
-var STRICT_BLOCK = false;
+var STRICT_BLOCK = true;
 
 // بادئات IPv6 الأردنية — شاملة لكل الفئات
 var JO_V6_PREFIX = {
