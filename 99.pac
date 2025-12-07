@@ -1,5 +1,6 @@
-// JO-HARD-MODE PAC — v5 (strict, optimized, patched final with updated IPv6 & IPv4 lists)
-// هدف: أعلى احتمال للّوبي/الماتش الأردني. أي خروج يكون عبر بروكسي أردني.
+// JO-ULTRA-JO-ONLY PAC — PUBG Jordan Focus
+// - يزيد احتمال أن يكون الفريق + الخصم من داخل الأردن
+// - MATCH / RECRUIT_SEARCH: حظر تام لأي سيرفر غير أردني → اللعبة تعيد البحث
 
 //================== نطاقات IPv4 كـ CIDR ==================//
 var JO_V4_CIDR = [
@@ -128,10 +129,10 @@ var JO_V4_CIDR = [
   { base: "193.108.134.0", mask: 23 },
   { base: "193.111.29.0", mask: 24 },
   { base: "193.189.148.0", mask: 24 },
-  { base: "194.110.236.0", mask: 24 },
+  { base: "194.110.236.0", mask: 24 }
 ];
 
-//================== IPv6 prefixes (استبدال تام للقائمة السابقة) ==================//
+//================== IPv6 prefixes الأردن ==================//
 var JO_V6_PREFIX = {
   LOBBY: [
     "2001:32c0::/29",
@@ -345,12 +346,10 @@ var JO_V6_PREFIX = {
   ]
 };
 
-//================== إعدادات عامة ==================//
+//================== إعدادات البروكسي ==================//
 var PROXY_CANDIDATES = [
   "212.35.66.45"
 ];
-
-// سماح صريح للبروكسيات المقبولة كـ "أردنية"
 var PROXY_WHITELIST = [
   "212.35.66.45"
 ];
@@ -363,10 +362,8 @@ var FIXED_PORT = {
   CDN:              80
 };
 
-// تبديل بين الحظر الصارم وتمرير غير الأردني عبر البروكسي الأردني
 var STRICT_BLOCK = false;
 
-// TTLs & كاش
 var DNS_TTL_MS = 15*1000;
 var PROXY_STICKY_TTL_MS = 60*1000;
 var GEO_TTL_MS = 60*60*1000;
@@ -400,7 +397,7 @@ function lc(s){return s&&s.toLowerCase?s.toLowerCase():s;}
 function isIp4(s){return /^\d+\.\d+\.\d+\.\d+$/.test(s);} 
 function isIp6Literal(s){return s&&s.indexOf(":")!==-1;}
 
-function hostMatch(h,arr){h=lc(h||"");if(!h)return false;for(var i=0;i<arr.length;i++){var pat=arr[i];if(shExpMatch(h,pat))return true;if(pat.indexOf("*.")==0){var suf=pat.substring(1);if(h.length>=suf.length&&h.substring(h.length-suf.length)===suf)return true;}}return false;}
+function hostMatch(h,arr){h=lc(h||"");if(!h)return false;for(var i=0;i<arr.length;i++){var p=arr[i];if(shExpMatch(h,p))return true;if(p.indexOf("*.")==0){var suf=p.substring(1);if(h.length>=suf.length&&h.substring(h.length-suf.length)===suf)return true;}}return false;}
 function urlMatch(u,arr){if(!u)return false;for(var i=0;i<arr.length;i++){if(shExpMatch(u,arr[i]))return true;}return false;}
 
 function dnsCached(h){
@@ -416,7 +413,6 @@ function dnsCached(h){
 
 function ip4ToInt(ip){var p=ip.split(".");return(((+p[0])<<24)>>>0)+(((+p[1])<<16)>>>0)+(((+p[2])<<8)>>>0)+((+p[3])>>>0);} 
 
-// تحضير الشبكات الخاصة بـ JO_V4_CIDR عند أول استخدام
 if(!C._JO_V4CIDR){
   C._JO_V4CIDR = [];
   for(var i=0; i<JO_V4_CIDR.length; i++){
@@ -438,15 +434,15 @@ if(!C._JO_V4CIDR){
 function isJOv4(ip){
   if(!ip||!isIp4(ip)) return false;
   var ipInt=ip4ToInt(ip);
-  var subnets=C._JO_V4CIDR;
-  for(var i=0;i<subnets.length;i++){
-    var s=subnets[i];
-    if(((ipInt & s.mask) >>> 0) === s.net) return true;
+  var subs=C._JO_V4CIDR;
+  for(var i=0;i<subs.length;i++){
+    var s=subs[i];
+    if(((ipInt & s.mask)>>>0) === s.net) return true;
   }
   return false;
 }
 
-// IPv6 tools
+// IPv6
 function pad4(h){return("0000"+h).slice(-4);} 
 function norm6(ip){
   if(!ip) return "";
@@ -492,7 +488,7 @@ function isJOv6ForCat(ip,cat){
   return false;
 }
 
-// تقييم "Latency" للبروكسي المرشح (DNS timing كـ pseudo-ping)
+// قياس latency بسيط للبروكسي
 function measureProxyLatency(h){
   if(isIp4(h) || isIp6Literal(h)) return 1;
   try{
@@ -583,15 +579,28 @@ function isUnsafeHost(h){
   return false;
 }
 
+//================== القلب: سياسة الأردن القوية ==================//
 function enforceCat(cat, host){
   var ip = host;
   if(!isIp4(ip) && !isIp6Literal(ip)){
     if(isUnsafeHost(host)) return (STRICT_BLOCK ? "PROXY 0.0.0.0:0" : proxyFor(cat));
     ip = dnsCached(host);
   }
-  if(isIp6Literal(ip) && isJOv6ForCat(ip,cat)) return proxyFor(cat);
-  if(isIp4(ip) && isJOv4(ip)) return proxyFor(cat);
 
+  var isJOdest = false;
+  if(isIp6Literal(ip) && isJOv6ForCat(ip,cat)) isJOdest = true;
+  if(isIp4(ip) && isJOv4(ip)) isJOdest = true;
+
+  // الوجهة أردنية → مرر عبر البروكسي الأردني مع البورت المخصص للفئة
+  if(isJOdest) return proxyFor(cat);
+
+  // الوجهة مش أردنية:
+  //   MATCH / RECRUIT_SEARCH → حظر تام، لإجبار اللعبة تعيد محاولة على سيرفر أردني
+  if(cat === "MATCH" || cat === "RECRUIT_SEARCH"){
+    return "PROXY 0.0.0.0:0";
+  }
+
+  // باقي الفئات:
   return (STRICT_BLOCK ? "PROXY 0.0.0.0:0" : proxyFor(cat));
 }
 
@@ -601,7 +610,7 @@ function FindProxyForURL(url, host){
 
   if(!clientIsJO() || !proxyIsJO()) return "PROXY 0.0.0.0:0";
 
-  // MATCH
+  // 1) MATCH (المباريات نفسها)
   if( urlMatch(url,URL_PATTERNS.MATCH)    ||
       hostMatch(host,PUBG_DOMAINS.MATCH)  ||
       shExpMatch(url,"*/game/join*")      ||
@@ -612,7 +621,7 @@ function FindProxyForURL(url, host){
     return enforceCat("MATCH", host);
   }
 
-  // LOBBY + RECRUIT/SEARCH
+  // 2) LOBBY + RECRUIT_SEARCH (تجنيد + لوبي)
   if( urlMatch(url,URL_PATTERNS.LOBBY)            ||
       hostMatch(host,PUBG_DOMAINS.LOBBY)          ||
       urlMatch(url,URL_PATTERNS.RECRUIT_SEARCH)   ||
@@ -622,10 +631,14 @@ function FindProxyForURL(url, host){
       shExpMatch(url,"*/teamfinder/*")            ||
       shExpMatch(url,"*/recruit/*")
     ){
+    // لوبي/تجنيد → نخضعه لنفس منطق الفئة المعطاة
+    if( urlMatch(url,URL_PATTERNS.RECRUIT_SEARCH) ||
+        hostMatch(host,PUBG_DOMAINS.RECRUIT_SEARCH) )
+      return enforceCat("RECRUIT_SEARCH", host);
     return enforceCat("LOBBY", host);
   }
 
-  // UPDATES / CDN
+  // 3) UPDATES / CDN
   if( urlMatch(url,URL_PATTERNS.UPDATES) ||
       urlMatch(url,URL_PATTERNS.CDN)     ||
       hostMatch(host,PUBG_DOMAINS.UPDATES) ||
@@ -634,6 +647,6 @@ function FindProxyForURL(url, host){
     return enforceCat("LOBBY", host);
   }
 
-  // Default
+  // 4) باقي الإنترنت
   return (STRICT_BLOCK ? "PROXY 0.0.0.0:0" : proxyFor("LOBBY"));
 }
